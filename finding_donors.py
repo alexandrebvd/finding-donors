@@ -21,7 +21,7 @@
 # ## Exploring the Data
 # Run the code cell below to load necessary Python libraries and load the census data. Note that the last column from this dataset, `'income'`, will be our target label (whether an individual makes more than, or at most, $50,000 annually). All other columns are features about each individual in the census database.
 
-# In[10]:
+# In[1]:
 
 
 # Import libraries necessary for this project
@@ -53,7 +53,7 @@ data.head(n=50)
 # 
 # ** HINT: ** You may need to look at the table above to understand how the `'income'` entries are formatted. 
 
-# In[37]:
+# In[2]:
 
 
 # TODO: Total number of records
@@ -75,13 +75,13 @@ print("Individuals making at most $50,000: {}".format(n_at_most_50k))
 print("Percentage of individuals making more than $50,000: {:.2f}%".format(greater_percent))
 
 
-# In[12]:
+# In[3]:
 
 
 data.describe()
 
 
-# In[13]:
+# In[4]:
 
 
 data.dtypes
@@ -112,7 +112,7 @@ data.dtypes
 # 
 # Run the code cell below to plot a histogram of these two features. Note the range of the values present and how they are distributed.
 
-# In[ ]:
+# In[5]:
 
 
 # Split the data into features and target label
@@ -127,7 +127,7 @@ vs.distribution(data)
 # 
 # Run the code cell below to perform a transformation on the data and visualize the results. Again, note the range of values and how they are distributed. 
 
-# In[ ]:
+# In[6]:
 
 
 # Log-transform the skewed features
@@ -144,7 +144,7 @@ vs.distribution(features_log_transformed, transformed = True)
 # 
 # Run the code cell below to normalize each numerical feature. We will use [`sklearn.preprocessing.MinMaxScaler`](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) for this.
 
-# In[ ]:
+# In[8]:
 
 
 # Import sklearn.preprocessing.StandardScaler
@@ -176,21 +176,23 @@ display(features_log_minmax_transform.head(n = 5))
 #  - Convert the target label `'income_raw'` to numerical entries.
 #    - Set records with "<=50K" to `0` and records with ">50K" to `1`.
 
-# In[ ]:
+# In[18]:
 
 
 # TODO: One-hot encode the 'features_log_minmax_transform' data using pandas.get_dummies()
-features_final = None
+features_final = pd.get_dummies(features_log_minmax_transform)
 
 # TODO: Encode the 'income_raw' data to numerical values
-income = None
+income = income_raw.map({'<=50K':0, '>50K':1})
 
 # Print the number of features after one-hot encoding
 encoded = list(features_final.columns)
 print("{} total features after one-hot encoding.".format(len(encoded)))
 
 # Uncomment the following line to see the encoded feature names
-# print encoded
+#print(encoded)
+print(income)
+print(features_final.shape)
 
 
 # ### Shuffle and Split Data
@@ -198,11 +200,11 @@ print("{} total features after one-hot encoding.".format(len(encoded)))
 # 
 # Run the code cell below to perform this split.
 
-# In[ ]:
+# In[20]:
 
 
 # Import train_test_split
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 
 # Split the 'features' and 'income' data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(features_final, 
