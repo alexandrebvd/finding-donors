@@ -364,10 +364,11 @@ print(precision)
 #  - Calculate the F-score for both the training subset and testing set.
 #    - Make sure that you set the `beta` parameter!
 
-# In[ ]:
+# In[11]:
 
 
 # TODO: Import two metrics from sklearn - fbeta_score and accuracy_score
+from sklearn.metrics import fbeta_score, accuracy_score
 
 def train_predict(learner, sample_size, X_train, y_train, X_test, y_test): 
     '''
@@ -384,33 +385,33 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
     
     # TODO: Fit the learner to the training data using slicing with 'sample_size' using .fit(training_features[:], training_labels[:])
     start = time() # Get start time
-    learner = None
+    learner = learner.fit(X_train[:sample_size], y_train[:sample_size])
     end = time() # Get end time
     
     # TODO: Calculate the training time
-    results['train_time'] = None
+    results['train_time'] = end - start
         
     # TODO: Get the predictions on the test set(X_test),
     #       then get predictions on the first 300 training samples(X_train) using .predict()
     start = time() # Get start time
-    predictions_test = None
-    predictions_train = None
+    predictions_test = learner.predict(X_test)
+    predictions_train = learner.predict(X_train[:300])
     end = time() # Get end time
     
     # TODO: Calculate the total prediction time
-    results['pred_time'] = None
+    results['pred_time'] = end - start
             
     # TODO: Compute accuracy on the first 300 training samples which is y_train[:300]
-    results['acc_train'] = None
+    results['acc_train'] = accuracy_score(y_train[:300], predictions_train)
         
     # TODO: Compute accuracy on test set using accuracy_score()
-    results['acc_test'] = None
+    results['acc_test'] = accuracy_score(y_test, predictions_test)
     
     # TODO: Compute F-score on the the first 300 training samples using fbeta_score()
-    results['f_train'] = None
+    results['f_train'] = fbeta_score(y_train[0:300], predictions_train, beta=0.5)
         
     # TODO: Compute F-score on the test set which is y_test
-    results['f_test'] = None
+    results['f_test'] = fbeta_score(y_test, predictions_test, beta=0.5)
        
     # Success
     print("{} trained on {} samples.".format(learner.__class__.__name__, sample_size))
@@ -430,23 +431,33 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
 # 
 # **Note:** Depending on which algorithms you chose, the following implementation may take some time to run!
 
-# In[ ]:
+# In[15]:
 
 
 # TODO: Import the three supervised learning models from sklearn
+from sklearn import svm, tree
+from sklearn.naive_bayes import GaussianNB
+
+'''Gaussian Naive Bayes (GaussianNB)
+Decision Trees
+Ensemble Methods (Bagging, AdaBoost, Random Forest, Gradient Boosting)
+K-Nearest Neighbors (KNeighbors)
+Stochastic Gradient Descent Classifier (SGDC)
+Support Vector Machines (SVM)
+Logistic Regression'''
 
 # TODO: Initialize the three models
-clf_A = None
-clf_B = None
-clf_C = None
+clf_A = svm.SVC(random_state=42)
+clf_B = tree.DecisionTreeClassifier(random_state=42)
+clf_C = GaussianNB()
 
 # TODO: Calculate the number of samples for 1%, 10%, and 100% of the training data
 # HINT: samples_100 is the entire training set i.e. len(y_train)
 # HINT: samples_10 is 10% of samples_100 (ensure to set the count of the values to be `int` and not `float`)
 # HINT: samples_1 is 1% of samples_100 (ensure to set the count of the values to be `int` and not `float`)
-samples_100 = None
-samples_10 = None
-samples_1 = None
+samples_100 = len(y_train)
+samples_10 = int(len(y_train) * 0.1)
+samples_1 = int(len(y_train) * 0.01)
 
 # Collect results on the learners
 results = {}
