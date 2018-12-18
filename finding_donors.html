@@ -13131,7 +13131,7 @@ dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import sklearn.preprocessing.StandardScaler</span>
@@ -13155,6 +13155,18 @@ dtype: object</pre>
 <div class="output_wrapper">
 <div class="output">
 
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>C:\Users\alexa\Anaconda3\envs\ml_nanodegree\lib\site-packages\sklearn\preprocessing\data.py:323: DataConversionWarning: Data with input dtype int64, float64 were all converted to float64 by MinMaxScaler.
+  return self.partial_fit(X, y)
+</pre>
+</div>
+</div>
 
 <div class="output_area">
 
@@ -13344,7 +13356,7 @@ dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: One-hot encode the &#39;features_log_minmax_transform&#39; data using pandas.get_dummies()</span>
@@ -13461,7 +13473,7 @@ Name: income, Length: 45222, dtype: int64
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import train_test_split</span>
@@ -13506,7 +13518,6 @@ Testing set has 9045 samples.
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<hr>
 <h2 id="Evaluating-Model-Performance">Evaluating Model Performance<a class="anchor-link" href="#Evaluating-Model-Performance">&#182;</a></h2><p>In this section, we will investigate four different algorithms, and determine which is best at modeling the data. Three of these algorithms will be supervised learners of your choice, and the fourth algorithm is known as a <em>naive predictor</em>.</p>
 
 </div>
@@ -13539,8 +13550,8 @@ It is a ratio of true positives(words classified as spam, and which are actually
 <h3 id="Question-1---Naive-Predictor-Performace">Question 1 - Naive Predictor Performace<a class="anchor-link" href="#Question-1---Naive-Predictor-Performace">&#182;</a></h3><ul>
 <li>If we chose a model that always predicted an individual made more than $50,000, what would  that model's accuracy and F-score be on this dataset? You must use the code cell below and assign your results to <code>'accuracy'</code> and <code>'fscore'</code> to be used later.</li>
 </ul>
-<p><strong> Please note </strong> that the the purpose of generating a naive predictor is simply to show what a base model without any intelligence would look like. In the real world, ideally your base model would be either the results of a previous model or could be based on a research paper upon which you are looking to improve. When there is no benchmark model set, getting a result better than random choice is a place you could start from.</p>
-<p><strong> HINT: </strong></p>
+<p><strong>Please note</strong> that the the purpose of generating a naive predictor is simply to show what a base model without any intelligence would look like. In the real world, ideally your base model would be either the results of a previous model or could be based on a research paper upon which you are looking to improve. When there is no benchmark model set, getting a result better than random choice is a place you could start from.</p>
+<p><strong>HINT:</strong></p>
 <ul>
 <li>When we have a model that always predicts '1' (i.e. the individual makes more than 50k) then our model will have no True Negatives(TN) or False Negatives(FN) as we are not making any negative('0' value) predictions. Therefore our Accuracy in this case becomes the same as our Precision(True Positives/(True Positives + False Positives)) as every prediction that we have made with value '1' that should have '0' becomes a False Positive; therefore our denominator in this case is the total number of records we have in total. </li>
 <li>Our Recall score(True Positives/(True Positives + False Negatives)) in this setting becomes 1 as we have no False Negatives.</li>
@@ -13551,30 +13562,53 @@ It is a ratio of true positives(words classified as spam, and which are actually
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">TP = np.sum(income) # Counting the ones as this is the naive case. Note that &#39;income&#39; is the &#39;income_raw&#39; data </span>
-<span class="sd">encoded to numerical values done in the data preprocessing step.</span>
-<span class="sd">FP = income.count() - TP # Specific to the naive case</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">TP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">income</span><span class="p">)</span> <span class="c1"># Counting the ones as this is the naive case. Note that &#39;income&#39; is the &#39;income_raw&#39; data </span>
+                    <span class="c1"># encoded to numerical values done in the data preprocessing step.</span>
+<span class="n">FP</span> <span class="o">=</span> <span class="n">income</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="n">TP</span> <span class="c1"># Specific to the naive case</span>
 
-<span class="sd">TN = 0 # No predicted negatives in the naive case</span>
-<span class="sd">FN = 0 # No predicted negatives in the naive case</span>
-<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">TN</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># No predicted negatives in the naive case</span>
+<span class="n">FN</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># No predicted negatives in the naive case</span>
+
 <span class="c1"># TODO: Calculate accuracy, precision and recall</span>
-<span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">recall</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">precision</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">TP</span><span class="o">/</span><span class="n">FP</span>
+<span class="n">recall</span> <span class="o">=</span> <span class="n">TP</span><span class="o">/</span><span class="n">TP</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="n">TP</span><span class="o">/</span><span class="n">FP</span>
 
 <span class="c1"># TODO: Calculate F-score using the formula above for beta = 0.5 and correct values for precision and recall.</span>
-<span class="n">fscore</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">fscore</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">precision</span> <span class="o">*</span> <span class="n">recall</span> <span class="o">/</span> <span class="p">((</span><span class="mf">0.5</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">precision</span><span class="p">)</span> <span class="o">+</span> <span class="n">recall</span><span class="p">)</span>
 
 <span class="c1"># Print the results </span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Naive Predictor: [Accuracy score: </span><span class="si">{:.4f}</span><span class="s2">, F-score: </span><span class="si">{:.4f}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">fscore</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">recall</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Naive Predictor: [Accuracy score: 0.3295, F-score: 0.3805]
+0.3295113776680191
+1.0
+0.3295113776680191
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -13608,7 +13642,7 @@ It is a ratio of true positives(words classified as spam, and which are actually
 <li>What are the weaknesses of the model; when does it perform poorly?</li>
 <li>What makes this model a good candidate for the problem, given what you know about the data?</li>
 </ul>
-<p><strong> HINT: </strong></p>
+<p><strong>HINT:</strong></p>
 <p>Structure your answer in the same format as above^, with 4 parts for each of the three models you pick. Please include references with your answer.</p>
 
 </div>
@@ -13618,7 +13652,66 @@ It is a ratio of true positives(words classified as spam, and which are actually
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong></p>
+<p><strong>Answer:</strong></p>
+<h3 id="Decision-Trees">Decision Trees<a class="anchor-link" href="#Decision-Trees">&#182;</a></h3><ul>
+<li><p>This model can be applied on he detection of fraudulent financial statements (FFS). Kirkos et al. (2007) have created a decision tree model to identify and detect FFS. Their model could correctly classify all non-fraud cases and 92% of fraud cases.</p>
+</li>
+<li><p>Strenghts (from <a href="https://scikit-learn.org/stable/modules/tree.html">https://scikit-learn.org/stable/modules/tree.html</a>):</p>
+<ul>
+<li>Decision trees are simple to understand and to interpret just by visualizing them;</li>
+<li>Requires little data preparation;</li>
+<li>The cost of predicting data is low because it is logarithmic in the number of data points used to train the tree;</li>
+<li>Handles multi-output problems;</li>
+<li>Handles both numeric and categorical data;</li>
+<li>Performs well even if its assumptions are somewhat violated by the true model from which the data were generated.</li>
+</ul>
+</li>
+<li><p>Weaknesses (from <a href="https://scikit-learn.org/stable/modules/tree.html">https://scikit-learn.org/stable/modules/tree.html</a>):</p>
+<ul>
+<li>Decision trees models can easily overfit the data;</li>
+<li>Decision trees can be unstable because small variations in the data might result in a completely different tree being generated.</li>
+<li>There are concepts that are hard to learn because decision trees do not express them easily, such as XOR, parity or multiplexer problems.</li>
+<li>Decision tree learners create biased trees if some classes dominate. It is therefore recommended to balance the dataset prior to fitting with the decision tree.</li>
+</ul>
+</li>
+<li></li>
+</ul>
+<h3 id="Support-Vector-Machines-(SVMs)">Support Vector Machines (SVMs)<a class="anchor-link" href="#Support-Vector-Machines-(SVMs)">&#182;</a></h3><ul>
+<li><p>This model can be applied on face detection algorithms by classifying parts of the image as a face and non-face and create a square boundary around the face. (<a href="https://data-flair.training/blogs/applications-of-svm/">https://data-flair.training/blogs/applications-of-svm/</a>)</p>
+</li>
+<li><p>Strengths (from <a href="https://scikit-learn.org/stable/modules/svm.html">https://scikit-learn.org/stable/modules/svm.html</a>):</p>
+<ul>
+<li>Effective in high dimensional spaces;</li>
+<li>Still effective in cases where number of dimensions is greater than the number of samples;</li>
+<li>Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient;</li>
+<li>Different Kernel functions can be specified for the decision function.</li>
+</ul>
+</li>
+<li><p>Weaknesses (from <a href="https://scikit-learn.org/stable/modules/svm.html">https://scikit-learn.org/stable/modules/svm.html</a>):</p>
+<ul>
+<li>If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial;</li>
+<li>SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.</li>
+</ul>
+</li>
+<li></li>
+</ul>
+<h3 id="Gaussian-Naive-Bayes">Gaussian Naive Bayes<a class="anchor-link" href="#Gaussian-Naive-Bayes">&#182;</a></h3><ul>
+<li><p>This model can be used on documet classification and spam filters.</p>
+</li>
+<li><p>Strengths (from <a href="https://scikit-learn.org/stable/modules/naive_bayes.html">https://scikit-learn.org/stable/modules/naive_bayes.html</a>)</p>
+<ul>
+<li>Works well despite its apparently over-simplified assumptions in many real-world situations;</li>
+<li>Require a small amount of training data to estimate the necessary parameters;</li>
+<li>Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods.</li>
+</ul>
+</li>
+<li><p>Weaknesses (from <a href="https://scikit-learn.org/stable/modules/naive_bayes.html">https://scikit-learn.org/stable/modules/naive_bayes.html</a>)</p>
+<ul>
+<li>Although naive Bayes is known as a decent classifier, it is known to be a bad estimator, so the probability outputs from predict_proba are not to be taken too seriously.</li>
+</ul>
+</li>
+<li></li>
+</ul>
 
 </div>
 </div>

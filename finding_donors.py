@@ -144,7 +144,7 @@ vs.distribution(features_log_transformed, transformed = True)
 # 
 # Run the code cell below to normalize each numerical feature. We will use [`sklearn.preprocessing.MinMaxScaler`](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) for this.
 
-# In[8]:
+# In[7]:
 
 
 # Import sklearn.preprocessing.StandardScaler
@@ -176,7 +176,7 @@ display(features_log_minmax_transform.head(n = 5))
 #  - Convert the target label `'income_raw'` to numerical entries.
 #    - Set records with "<=50K" to `0` and records with ">50K" to `1`.
 
-# In[18]:
+# In[8]:
 
 
 # TODO: One-hot encode the 'features_log_minmax_transform' data using pandas.get_dummies()
@@ -200,7 +200,7 @@ print(features_final.shape)
 # 
 # Run the code cell below to perform this split.
 
-# In[20]:
+# In[9]:
 
 
 # Import train_test_split
@@ -217,7 +217,6 @@ print("Training set has {} samples.".format(X_train.shape[0]))
 print("Testing set has {} samples.".format(X_test.shape[0]))
 
 
-# ----
 # ## Evaluating Model Performance
 # In this section, we will investigate four different algorithms, and determine which is best at modeling the data. Three of these algorithms will be supervised learners of your choice, and the fourth algorithm is known as a *naive predictor*.
 
@@ -228,7 +227,7 @@ print("Testing set has {} samples.".format(X_test.shape[0]))
 # 
 # In particular, when $\beta = 0.5$, more emphasis is placed on precision. This is called the **F$_{0.5}$ score** (or F-score for simplicity).
 # 
-# Looking at the distribution of classes (those who make at most \$50,000, and those who make more), it's clear most individuals do not make more than \$50,000. This can greatly affect **accuracy**, since we could simply say *"this person does not make more than \$50,000"* and generally be right, without ever looking at the data! Making such a statement would be called **naive**, since we have not considered any information to substantiate the claim. It is always important to consider the *naive prediction* for your data, to help establish a benchmark for whether a model is performing well. That been said, using that prediction would be pointless: If we predicted all people made less than \$50,000, *CharityML* would identify no one as donors. 
+# Looking at the distribution of classes (those who make at most \\$50,000, and those who make more), it's clear most individuals do not make more than \$50,000. This can greatly affect **accuracy**, since we could simply say *"this person does not make more than \$50,000"* and generally be right, without ever looking at the data! Making such a statement would be called **naive**, since we have not considered any information to substantiate the claim. It is always important to consider the *naive prediction* for your data, to help establish a benchmark for whether a model is performing well. That been said, using that prediction would be pointless: If we predicted all people made less than \$50,000, *CharityML* would identify no one as donors. 
 # 
 # 
 # #### Note: Recap of accuracy, precision, recall
@@ -250,34 +249,36 @@ print("Testing set has {} samples.".format(X_test.shape[0]))
 # ### Question 1 - Naive Predictor Performace
 # * If we chose a model that always predicted an individual made more than $50,000, what would  that model's accuracy and F-score be on this dataset? You must use the code cell below and assign your results to `'accuracy'` and `'fscore'` to be used later.
 # 
-# ** Please note ** that the the purpose of generating a naive predictor is simply to show what a base model without any intelligence would look like. In the real world, ideally your base model would be either the results of a previous model or could be based on a research paper upon which you are looking to improve. When there is no benchmark model set, getting a result better than random choice is a place you could start from.
+# **Please note** that the the purpose of generating a naive predictor is simply to show what a base model without any intelligence would look like. In the real world, ideally your base model would be either the results of a previous model or could be based on a research paper upon which you are looking to improve. When there is no benchmark model set, getting a result better than random choice is a place you could start from.
 # 
-# ** HINT: ** 
+# **HINT:** 
 # 
 # * When we have a model that always predicts '1' (i.e. the individual makes more than 50k) then our model will have no True Negatives(TN) or False Negatives(FN) as we are not making any negative('0' value) predictions. Therefore our Accuracy in this case becomes the same as our Precision(True Positives/(True Positives + False Positives)) as every prediction that we have made with value '1' that should have '0' becomes a False Positive; therefore our denominator in this case is the total number of records we have in total. 
 # * Our Recall score(True Positives/(True Positives + False Negatives)) in this setting becomes 1 as we have no False Negatives.
 
-# In[ ]:
+# In[10]:
 
 
-'''
 TP = np.sum(income) # Counting the ones as this is the naive case. Note that 'income' is the 'income_raw' data 
-encoded to numerical values done in the data preprocessing step.
+                    # encoded to numerical values done in the data preprocessing step.
 FP = income.count() - TP # Specific to the naive case
 
 TN = 0 # No predicted negatives in the naive case
 FN = 0 # No predicted negatives in the naive case
-'''
+
 # TODO: Calculate accuracy, precision and recall
-accuracy = None
-recall = None
-precision = None
+accuracy = TP/FP
+recall = TP/TP
+precision = TP/FP
 
 # TODO: Calculate F-score using the formula above for beta = 0.5 and correct values for precision and recall.
-fscore = None
+fscore = (1 + 0.5**2) * precision * recall / ((0.5**2 * precision) + recall)
 
 # Print the results 
 print("Naive Predictor: [Accuracy score: {:.4f}, F-score: {:.4f}]".format(accuracy, fscore))
+print(accuracy)
+print(recall)
+print(precision)
 
 
 # ###  Supervised Learning Models
@@ -298,11 +299,59 @@ print("Naive Predictor: [Accuracy score: {:.4f}, F-score: {:.4f}]".format(accura
 # - What are the weaknesses of the model; when does it perform poorly?
 # - What makes this model a good candidate for the problem, given what you know about the data?
 # 
-# ** HINT: **
+# **HINT:**
 # 
 # Structure your answer in the same format as above^, with 4 parts for each of the three models you pick. Please include references with your answer.
 
-# **Answer: **
+# **Answer:**
+# ### Decision Trees
+# - This model can be applied on he detection of fraudulent financial statements (FFS). Kirkos et al. (2007) have created a decision tree model to identify and detect FFS. Their model could correctly classify all non-fraud cases and 92% of fraud cases.
+# 
+# - Strenghts (from https://scikit-learn.org/stable/modules/tree.html):
+#     - Decision trees are simple to understand and to interpret just by visualizing them;
+#     - Requires little data preparation;
+#     - The cost of predicting data is low because it is logarithmic in the number of data points used to train the tree;
+#     - Handles multi-output problems;
+#     - Handles both numeric and categorical data;
+#     - Performs well even if its assumptions are somewhat violated by the true model from which the data were generated.
+# 
+# - Weaknesses (from https://scikit-learn.org/stable/modules/tree.html):
+#     - Decision trees models can easily overfit the data;
+#     - Decision trees can be unstable because small variations in the data might result in a completely different tree being generated.
+#     - There are concepts that are hard to learn because decision trees do not express them easily, such as XOR, parity or multiplexer problems.
+#     - Decision tree learners create biased trees if some classes dominate. It is therefore recommended to balance the dataset prior to fitting with the decision tree.
+# 
+# - 
+# 
+# 
+# ### Support Vector Machines (SVMs)
+# - This model can be applied on face detection algorithms by classifying parts of the image as a face and non-face and create a square boundary around the face. (https://data-flair.training/blogs/applications-of-svm/)
+# 
+# - Strengths (from https://scikit-learn.org/stable/modules/svm.html):
+#     - Effective in high dimensional spaces;
+#     - Still effective in cases where number of dimensions is greater than the number of samples;
+#     - Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient;
+#     - Different Kernel functions can be specified for the decision function.
+# 
+# - Weaknesses (from https://scikit-learn.org/stable/modules/svm.html):
+#     - If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial;
+#     - SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
+# 
+# - 
+# 
+# 
+# ### Gaussian Naive Bayes
+# - This model can be used on documet classification and spam filters.
+# 
+# - Strengths (from https://scikit-learn.org/stable/modules/naive_bayes.html)
+#     - Works well despite its apparently over-simplified assumptions in many real-world situations;
+#     - Require a small amount of training data to estimate the necessary parameters;
+#     - Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods.
+# 
+# - Weaknesses (from https://scikit-learn.org/stable/modules/naive_bayes.html)
+#     - Although naive Bayes is known as a decent classifier, it is known to be a bad estimator, so the probability outputs from predict_proba are not to be taken too seriously.
+# 
+# - 
 
 # ### Implementation - Creating a Training and Predicting Pipeline
 # To properly evaluate the performance of each model you've chosen, it's important that you create a training and predicting pipeline that allows you to quickly and effectively train models using various sizes of training data and perform predictions on the testing data. Your implementation here will be used in the following section.
