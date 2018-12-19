@@ -53,8 +53,7 @@ def evaluate(results, accuracy, f1):
     Visualization code to display results of various learners.
     
     inputs:
-      - learners: a list of supervised learners
-      - stats: a list of dictionaries of the statistic results from 'train_predict()'
+      - results: a disctionary where keys are types of supervised learners and values are dictionaries of the statistc results from 'train_predict()'
       - accuracy: The score for the naive predictor
       - f1: The score for the naive predictor
     """

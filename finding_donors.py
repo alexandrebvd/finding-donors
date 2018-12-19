@@ -316,42 +316,44 @@ print(precision)
 #     - Performs well even if its assumptions are somewhat violated by the true model from which the data were generated.
 # 
 # - Weaknesses (from https://scikit-learn.org/stable/modules/tree.html):
-#     - Decision trees models can easily overfit the data;
+#     - Decision trees are prone to overfitting, especially when a tree is particularly deep;
 #     - Decision trees can be unstable because small variations in the data might result in a completely different tree being generated.
 #     - There are concepts that are hard to learn because decision trees do not express them easily, such as XOR, parity or multiplexer problems.
 #     - Decision tree learners create biased trees if some classes dominate. It is therefore recommended to balance the dataset prior to fitting with the decision tree.
 # 
-# - 
+# -  Decision tree models are particularly good at binary classification (whether an individual makes over $50k or not).
+# 
+# 
+# ### Random Forest (Ensemble Method)
+# - In Banking, random forests are used for example to predict customers who will use the bank’s services more frequently than others and repay their debt in time. (https://towardsdatascience.com/the-random-forest-algorithm-d457d499ffcd)
+# 
+# - Strengths (from https://towardsdatascience.com/decision-trees-and-random-forests-df0c3123f991):
+#     - Ability to limit overfitting without substantially increasing error due to bias;
+#     - Random forests are a strong modeling technique and much more robust than a single decision tree;
+#     - Easy to use machine learning algorithm that produces, even without hyper-parameter tuning, a great result most of the time;
+#     - It can be used for both classification and regression tasks. This model works well with a lot of different feature types, like binary, categorical and numerical.
+# 
+# - Weaknesses (from https://towardsdatascience.com/the-random-forest-algorithm-d457d499ffcd)
+#     - The main limitation of Random Forest is that a large number of trees can make the algorithm to slow and ineffective for real-time predictions.
+# 
+# - Since the task is to construct a model to perform binary classification, a random forest model should have a good performance. This model works well with a lot of different feature types, like binary, categorical and numerical.
 # 
 # 
 # ### Support Vector Machines (SVMs)
 # - This model can be applied on face detection algorithms by classifying parts of the image as a face and non-face and create a square boundary around the face. (https://data-flair.training/blogs/applications-of-svm/)
 # 
-# - Strengths (from https://scikit-learn.org/stable/modules/svm.html):
+# - Strengths (from https://scikit-learn.org/stable/modules/svm.html ):
 #     - Effective in high dimensional spaces;
 #     - Still effective in cases where number of dimensions is greater than the number of samples;
 #     - Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient;
 #     - Different Kernel functions can be specified for the decision function.
 # 
-# - Weaknesses (from https://scikit-learn.org/stable/modules/svm.html):
+# - Weaknesses (from https://scikit-learn.org/stable/modules/svm.html ):
 #     - If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial;
 #     - SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
-# 
-# - 
-# 
-# 
-# ### Gaussian Naive Bayes
-# - This model can be used on documet classification and spam filters.
-# 
-# - Strengths (from https://scikit-learn.org/stable/modules/naive_bayes.html)
-#     - Works well despite its apparently over-simplified assumptions in many real-world situations;
-#     - Require a small amount of training data to estimate the necessary parameters;
-#     - Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods.
-# 
-# - Weaknesses (from https://scikit-learn.org/stable/modules/naive_bayes.html)
-#     - Although naive Bayes is known as a decent classifier, it is known to be a bad estimator, so the probability outputs from predict_proba are not to be taken too seriously.
-# 
-# - 
+#     - SVMs don't work well in large datasets because of the growing amount of time it takes to train and make predictions.
+#     
+# - SVM is able to work with both linear and non-linear data.
 
 # ### Implementation - Creating a Training and Predicting Pipeline
 # To properly evaluate the performance of each model you've chosen, it's important that you create a training and predicting pipeline that allows you to quickly and effectively train models using various sizes of training data and perform predictions on the testing data. Your implementation here will be used in the following section.
@@ -431,12 +433,13 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
 # 
 # **Note:** Depending on which algorithms you chose, the following implementation may take some time to run!
 
-# In[15]:
+# In[14]:
 
 
 # TODO: Import the three supervised learning models from sklearn
 from sklearn import svm, tree
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
 
 '''Gaussian Naive Bayes (GaussianNB)
 Decision Trees
@@ -449,7 +452,7 @@ Logistic Regression'''
 # TODO: Initialize the three models
 clf_A = svm.SVC(random_state=42)
 clf_B = tree.DecisionTreeClassifier(random_state=42)
-clf_C = GaussianNB()
+clf_C = RandomForestClassifier(random_state=42)
 
 # TODO: Calculate the number of samples for 1%, 10%, and 100% of the training data
 # HINT: samples_100 is the entire training set i.e. len(y_train)
@@ -485,7 +488,7 @@ vs.evaluate(results, accuracy, fscore)
 # * prediction/training time
 # * the algorithm's suitability for the data.
 
-# **Answer: **
+# **Answer:** After analyzing the results for the three models, the best option seems to be the random forest model. Regarding the F-score when  100% of the training data is used, the support vector machine and the random forest models achieved very similar F-score (about 0.65) leaving the decision tree model behind. When we look to the training and prediction times, the random forest model wins by a large difference compared to the support vector machine (actually they are some orders of magnitude apart!). Finally, the random forest is very suitable for the dataset because it can handle all the different kinds of data types.
 
 # ### Question 4 - Describing the Model in Layman's Terms
 # 
@@ -495,7 +498,8 @@ vs.evaluate(results, accuracy, fscore)
 # 
 # When explaining your model, if using external resources please include all citations.
 
-# **Answer: ** 
+# **Answer:** Random forest is a supervised learning algorithm, which means the model is trained by providing it with both the  features and the real class (or label) of each observation of your data. It is a very versatile algorithm because you can use it on either classification or regression problems. You can think of this model as if it were a collection of decision tree models where each one randomly selects just some of the features available for sppliting a node. After that, the results of all descision trees are combined using the bagging method, which is basically a voting system among all trees, to achieve the final result.
+# In case you don't know what a decision tree model is, don't worry, it is a very simple algorithm that splits your data points in different classes using only "if-then-else" logic based on the values of each feature.
 
 # ### Implementation: Model Tuning
 # Fine tune the chosen model. Use grid search (`GridSearchCV`) with at least one important parameter tuned with at least 3 different values. You will need to use the entire training set for this. In the code cell below, you will need to implement the following:
