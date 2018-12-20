@@ -515,26 +515,28 @@ vs.evaluate(results, accuracy, fscore)
 # 
 # **Note:** Depending on the algorithm chosen and the parameter list, the following implementation may take some time to run!
 
-# In[ ]:
+# In[19]:
 
 
 # TODO: Import 'GridSearchCV', 'make_scorer', and any other necessary libraries
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import make_scorer
 
 # TODO: Initialize the classifier
-clf = None
+clf = RandomForestClassifier(random_state=42)
 
 # TODO: Create the parameters list you wish to tune, using a dictionary if needed.
 # HINT: parameters = {'parameter_1': [value1, value2], 'parameter_2': [value1, value2]}
-parameters = None
+parameters = {'max_depth':[10,50,100,200], 'min_samples_split':[2,5,10,20], 'min_samples_leaf':[1,5,10,20],              'max_leaf_nodes':[None,2,5,10], 'oob_score':[False, True]}
 
 # TODO: Make an fbeta_score scoring object using make_scorer()
-scorer = None
+scorer = make_scorer(fbeta_score, beta=0.5)
 
 # TODO: Perform grid search on the classifier using 'scorer' as the scoring method using GridSearchCV()
-grid_obj = None
+grid_obj = GridSearchCV(clf, parameters, scoring=scorer)
 
 # TODO: Fit the grid search object to the training data and find the optimal parameters using fit()
-grid_fit = None
+grid_fit = grid_obj.fit(X_train, y_train)
 
 # Get the estimator
 best_clf = grid_fit.best_estimator_
@@ -552,6 +554,12 @@ print("Final accuracy score on the testing data: {:.4f}".format(accuracy_score(y
 print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, best_predictions, beta = 0.5)))
 
 
+# In[20]:
+
+
+best_clf
+
+
 # ### Question 5 - Final Model Evaluation
 # 
 # * What is your optimized model's accuracy and F-score on the testing data? 
@@ -564,11 +572,17 @@ print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, bes
 # 
 # |     Metric     | Unoptimized Model | Optimized Model |
 # | :------------: | :---------------: | :-------------: | 
-# | Accuracy Score |                   |                 |
-# | F-score        |                   |   EXAMPLE       |
+# | Accuracy Score | 0.8433            | 0.8568          |
+# | F-score        | 0.6848            | 0.7210          |
 # 
 
-# **Answer: **
+# **Answer:**
+# 
+# - Final accuracy score on the testing data: 0.8568 / Final F-score on the testing data: 0.7210
+# 
+# - Both results are slightly better than the unoptimized model.
+# 
+# - The naive predictor had an accuracy score of 0.3295 and a F-score of 0.3805. Therefore, the optimized model proves to be a lot better than the naive predictor.
 
 # ----
 # ## Feature Importance
@@ -577,10 +591,26 @@ print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, bes
 # 
 # Choose a scikit-learn classifier (e.g., adaboost, random forests) that has a `feature_importance_` attribute, which is a function that ranks the importance of features according to the chosen classifier.  In the next python cell fit this classifier to training set and use this attribute to determine the top 5 most important features for the census dataset.
 
+# In[23]:
+
+
+best_clf.feature_importances_
+
+
 # ### Question 6 - Feature Relevance Observation
 # When **Exploring the Data**, it was shown there are thirteen available features for each individual on record in the census data. Of these thirteen records, which five features do you believe to be most important for prediction, and in what order would you rank them and why?
 
 # **Answer:**
+# 
+# 1) Occupation: different occupations result in different annual income.
+# 
+# 2) Education level: usually the more educated a person is, the more likely he/she is to earn a higher salary.
+# 
+# 3) Native country: different countries have different economies. Hence, an engineer in Germany might earn much more than an engineer in Brazil.
+# 
+# 4) Age: usually an older person has more work experience, which means he/she can have more responsabilities and have a higher income.
+# 
+# 5) Sex: there has always been, on average, a gap between men and women for the same job position in almost every countries.
 
 # ### Implementation - Extracting Feature Importance
 # Choose a `scikit-learn` supervised learning algorithm that has a `feature_importance_` attribute availble for it. This attribute is a function that ranks the importance of each feature when making predictions based on the chosen algorithm.
@@ -590,17 +620,17 @@ print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, bes
 #  - Train the supervised model on the entire training set.
 #  - Extract the feature importances using `'.feature_importances_'`.
 
-# In[ ]:
+# In[24]:
 
 
 # TODO: Import a supervised learning model that has 'feature_importances_'
-
+#using best_clf of random forest found before
 
 # TODO: Train the supervised model on the training set using .fit(X_train, y_train)
-model = None
+model = best_clf
 
 # TODO: Extract the feature importances using .feature_importances_ 
-importances = None
+importances = model.feature_importances_
 
 # Plot
 vs.feature_plot(importances, X_train, y_train)
@@ -613,12 +643,20 @@ vs.feature_plot(importances, X_train, y_train)
 # * If you were close to the same answer, how does this visualization confirm your thoughts? 
 # * If you were not close, why do you think these features are more relevant?
 
-# **Answer:**
+# **Answer:** I just got 'age' correct as one of the five most relevant features.
+# 
+# - Marital status: I was really surprised by this one. I can't really tell whether single people earn more than married people or if it is the other way around.
+# 
+# - Capital gain: it makes sense because the more one gain, the closer he/she gets to earning more than \$50K.
+# 
+# - Education-num: I think it is highly correlated to education level. I guess they could even be substitutes.
+# 
+# - Hours per week: It makes sense since one tends to earn more by working more hours.
 
 # ### Feature Selection
 # How does a model perform if we only use a subset of all the available features in the data? With less features required to train, the expectation is that training and prediction time is much lower — at the cost of performance metrics. From the visualization above, we see that the top five most important features contribute more than half of the importance of **all** features present in the data. This hints that we can attempt to *reduce the feature space* and simplify the information required for the model to learn. The code cell below will use the same optimized model you found earlier, and train it on the same training set *with only the top five important features*. 
 
-# In[ ]:
+# In[25]:
 
 
 # Import functionality for cloning a model
@@ -649,6 +687,10 @@ print("F-score on testing data: {:.4f}".format(fbeta_score(y_test, reduced_predi
 # * If training time was a factor, would you consider using the reduced data as your training set?
 
 # **Answer:**
+# 
+# - The model that used only five features had F-score and accuracy score a bit worse than the optimized model using all features, but still a bit better than the unoptimized model using all features.
+# 
+# - I would consider reducing the data for sure if training time was an important factor, as long as the final result didn't differ so much from the optimized model.
 
 # > **Note**: Once you have completed all of the code implementations and successfully answered each question above, you may finalize your work by exporting the iPython Notebook as an HTML document. You can do this by using the menu above and navigating to  
 # **File -> Download as -> HTML (.html)**. Include the finished document along with this notebook as your submission.
