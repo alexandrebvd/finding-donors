@@ -21,7 +21,7 @@
 # ## Exploring the Data
 # Run the code cell below to load necessary Python libraries and load the census data. Note that the last column from this dataset, `'income'`, will be our target label (whether an individual makes more than, or at most, $50,000 annually). All other columns are features about each individual in the census database.
 
-# In[1]:
+# In[11]:
 
 
 # Import libraries necessary for this project
@@ -53,7 +53,7 @@ data.head(n=50)
 # 
 # ** HINT: ** You may need to look at the table above to understand how the `'income'` entries are formatted. 
 
-# In[2]:
+# In[12]:
 
 
 # TODO: Total number of records
@@ -75,13 +75,13 @@ print("Individuals making at most $50,000: {}".format(n_at_most_50k))
 print("Percentage of individuals making more than $50,000: {:.2f}%".format(greater_percent))
 
 
-# In[3]:
+# In[13]:
 
 
 data.describe()
 
 
-# In[4]:
+# In[14]:
 
 
 data.dtypes
@@ -112,7 +112,7 @@ data.dtypes
 # 
 # Run the code cell below to plot a histogram of these two features. Note the range of the values present and how they are distributed.
 
-# In[5]:
+# In[15]:
 
 
 # Split the data into features and target label
@@ -127,7 +127,7 @@ vs.distribution(data)
 # 
 # Run the code cell below to perform a transformation on the data and visualize the results. Again, note the range of values and how they are distributed. 
 
-# In[6]:
+# In[16]:
 
 
 # Log-transform the skewed features
@@ -144,7 +144,7 @@ vs.distribution(features_log_transformed, transformed = True)
 # 
 # Run the code cell below to normalize each numerical feature. We will use [`sklearn.preprocessing.MinMaxScaler`](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) for this.
 
-# In[7]:
+# In[17]:
 
 
 # Import sklearn.preprocessing.StandardScaler
@@ -176,7 +176,7 @@ display(features_log_minmax_transform.head(n = 5))
 #  - Convert the target label `'income_raw'` to numerical entries.
 #    - Set records with "<=50K" to `0` and records with ">50K" to `1`.
 
-# In[8]:
+# In[18]:
 
 
 # TODO: One-hot encode the 'features_log_minmax_transform' data using pandas.get_dummies()
@@ -200,7 +200,7 @@ print(features_final.shape)
 # 
 # Run the code cell below to perform this split.
 
-# In[9]:
+# In[19]:
 
 
 # Import train_test_split
@@ -256,20 +256,27 @@ print("Testing set has {} samples.".format(X_test.shape[0]))
 # * When we have a model that always predicts '1' (i.e. the individual makes more than 50k) then our model will have no True Negatives(TN) or False Negatives(FN) as we are not making any negative('0' value) predictions. Therefore our Accuracy in this case becomes the same as our Precision(True Positives/(True Positives + False Positives)) as every prediction that we have made with value '1' that should have '0' becomes a False Positive; therefore our denominator in this case is the total number of records we have in total. 
 # * Our Recall score(True Positives/(True Positives + False Negatives)) in this setting becomes 1 as we have no False Negatives.
 
-# In[10]:
+# In[20]:
 
 
+'''
 TP = np.sum(income) # Counting the ones as this is the naive case. Note that 'income' is the 'income_raw' data 
                     # encoded to numerical values done in the data preprocessing step.
 FP = income.count() - TP # Specific to the naive case
 
 TN = 0 # No predicted negatives in the naive case
 FN = 0 # No predicted negatives in the naive case
+'''
+
+TP = np.sum(income)
+FP = income.count() - TP
+TN = 0
+FN = 0
 
 # TODO: Calculate accuracy, precision and recall
-accuracy = TP/FP
-recall = TP/TP
-precision = TP/FP
+accuracy = (TP + TN) / (TP + FP + FN + TN)
+recall = TP / (TP + FN)
+precision = TP / (TP + FP)
 
 # TODO: Calculate F-score using the formula above for beta = 0.5 and correct values for precision and recall.
 fscore = (1 + 0.5**2) * precision * recall / ((0.5**2 * precision) + recall)
@@ -321,7 +328,7 @@ print(precision)
 #     - There are concepts that are hard to learn because decision trees do not express them easily, such as XOR, parity or multiplexer problems.
 #     - Decision tree learners create biased trees if some classes dominate. It is therefore recommended to balance the dataset prior to fitting with the decision tree.
 # 
-# -  Decision tree models are particularly good at binary classification (whether an individual makes over $50k or not).
+# -  A decision tree model is a good candidate to classification problems with many features like this one and is very simple to get good results even using default parameters. However, one should be careful to avoid overfitting the data.
 # 
 # 
 # ### Random Forest (Ensemble Method)
@@ -336,7 +343,7 @@ print(precision)
 # - Weaknesses (from https://towardsdatascience.com/the-random-forest-algorithm-d457d499ffcd)
 #     - The main limitation of Random Forest is that a large number of trees can make the algorithm to slow and ineffective for real-time predictions.
 # 
-# - Since the task is to construct a model to perform binary classification, a random forest model should have a good performance. This model works well with a lot of different feature types, like binary, categorical and numerical.
+# - Since the task is to construct a model to perform binary classification, a random forest model should have a good performance on a dataset like this with so many features. This model works well with a lot of different feature types, like binary, categorical and numerical. However, if the number of trees is too big, the model can get slower than other candidates.
 # 
 # 
 # ### Support Vector Machines (SVMs)
@@ -353,7 +360,7 @@ print(precision)
 #     - SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
 #     - SVMs don't work well in large datasets because of the growing amount of time it takes to train and make predictions.
 #     
-# - SVM is able to work with both linear and non-linear data.
+# - SVM is able to work with both linear and non-linear data. Given that there are so many features, I expected the data to be non-linear. Hence, using an appropriate kernel like rbf, I would be able to effectively tune the classifier.
 
 # ### Implementation - Creating a Training and Predicting Pipeline
 # To properly evaluate the performance of each model you've chosen, it's important that you create a training and predicting pipeline that allows you to quickly and effectively train models using various sizes of training data and perform predictions on the testing data. Your implementation here will be used in the following section.
@@ -366,7 +373,7 @@ print(precision)
 #  - Calculate the F-score for both the training subset and testing set.
 #    - Make sure that you set the `beta` parameter!
 
-# In[11]:
+# In[21]:
 
 
 # TODO: Import two metrics from sklearn - fbeta_score and accuracy_score
@@ -433,8 +440,11 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
 # 
 # **Note:** Depending on which algorithms you chose, the following implementation may take some time to run!
 
-# In[14]:
+# In[22]:
 
+
+import warnings
+warnings.filterwarnings('ignore')  # "error", "ignore", "always", "default", "module" or "once"
 
 # TODO: Import the three supervised learning models from sklearn
 from sklearn import svm, tree
@@ -498,8 +508,11 @@ vs.evaluate(results, accuracy, fscore)
 # 
 # When explaining your model, if using external resources please include all citations.
 
-# **Answer:** Random forest is a supervised learning algorithm, which means the model is trained by providing it with both the  features and the real class (or label) of each observation of your data. It is a very versatile algorithm because you can use it on either classification or regression problems. You can think of this model as if it were a collection of decision tree models where each one randomly selects just some of the features available for sppliting a node. After that, the results of all descision trees are combined using the bagging method, which is basically a voting system among all trees, to achieve the final result.
-# In case you don't know what a decision tree model is, don't worry, it is a very simple algorithm that splits your data points in different classes using only "if-then-else" logic based on the values of each feature.
+# **Answer:**
+#     
+# Random forest is a supervised learning algorithm, which means the model is trained by providing it with both the  features and the real class (or label) of each observation of your data. It is a very versatile algorithm because you can use it on either classification or regression problems. You can think of this model as if it were a collection of decision tree models where each one randomly selects only some of the features available on the data to train the model. Then, each decision tree in this "forest" is unique and has a unique result. After that, the results of all descision trees are combined using the bagging method, which is basically a voting system among all trees, to achieve the final result.
+# 
+# In case you don't know what a decision tree model is, don't worry, it is a very simple algorithm that splits your data points in different classes using only "if-then-else" logic based on the values of each feature. To illustrate a decision tree model suppose you have some fruits (apple, orange, lemon, etc). You can figure each fruit based on aspects like color, weight, taste etc. So, for the above fruits if you say the weight is small (for example less than 50g) and color is yellow, then it is a lemon.
 
 # ### Implementation: Model Tuning
 # Fine tune the chosen model. Use grid search (`GridSearchCV`) with at least one important parameter tuned with at least 3 different values. You will need to use the entire training set for this. In the code cell below, you will need to implement the following:
@@ -515,7 +528,7 @@ vs.evaluate(results, accuracy, fscore)
 # 
 # **Note:** Depending on the algorithm chosen and the parameter list, the following implementation may take some time to run!
 
-# In[19]:
+# In[23]:
 
 
 # TODO: Import 'GridSearchCV', 'make_scorer', and any other necessary libraries
@@ -554,7 +567,7 @@ print("Final accuracy score on the testing data: {:.4f}".format(accuracy_score(y
 print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, best_predictions, beta = 0.5)))
 
 
-# In[20]:
+# In[24]:
 
 
 best_clf
@@ -591,7 +604,7 @@ best_clf
 # 
 # Choose a scikit-learn classifier (e.g., adaboost, random forests) that has a `feature_importance_` attribute, which is a function that ranks the importance of features according to the chosen classifier.  In the next python cell fit this classifier to training set and use this attribute to determine the top 5 most important features for the census dataset.
 
-# In[23]:
+# In[25]:
 
 
 best_clf.feature_importances_
@@ -620,7 +633,7 @@ best_clf.feature_importances_
 #  - Train the supervised model on the entire training set.
 #  - Extract the feature importances using `'.feature_importances_'`.
 
-# In[24]:
+# In[26]:
 
 
 # TODO: Import a supervised learning model that has 'feature_importances_'
@@ -656,7 +669,7 @@ vs.feature_plot(importances, X_train, y_train)
 # ### Feature Selection
 # How does a model perform if we only use a subset of all the available features in the data? With less features required to train, the expectation is that training and prediction time is much lower — at the cost of performance metrics. From the visualization above, we see that the top five most important features contribute more than half of the importance of **all** features present in the data. This hints that we can attempt to *reduce the feature space* and simplify the information required for the model to learn. The code cell below will use the same optimized model you found earlier, and train it on the same training set *with only the top five important features*. 
 
-# In[25]:
+# In[27]:
 
 
 # Import functionality for cloning a model
